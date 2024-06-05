@@ -1,11 +1,7 @@
 package stirling.software.SPDF.config.security;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -182,6 +178,46 @@ public class UserService implements UserServiceInterface {
         user.setExpireDate(currentDate.plusMonths(3).plusDays(1));
         user.setExpire(false);
         userRepository.save(user);
+    }
+
+    public List<String> saveUser() throws IllegalArgumentException {
+        int numberOfUsernames = 10;
+        int minLength = 5;
+        int maxLength = 10;
+        List<String> usernames = new ArrayList<>();
+        for (int i = 0; i < numberOfUsernames; i++) {
+            String username = "";
+            username = generateUsername(minLength, maxLength);
+            if (!isUsernameValid(username)) {
+                continue;
+            }
+            LocalDate currentDate = LocalDate.now();
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword(passwordEncoder.encode("123456"));
+            user.addAuthority(new Authority("ROLE_WEB_ONLY_USER", user));
+            user.setEnabled(true);
+            user.setAuthenticationType(AuthenticationType.WEB);
+            user.setFirstLogin(true);
+            user.setChargeDate(currentDate);
+            user.setExpireDate(currentDate.plusMonths(3).plusDays(1));
+            user.setExpire(false);
+            userRepository.save(user);
+            usernames.add(username);
+        }
+        return usernames;
+    }
+
+    private static String generateUsername(int minLength, int maxLength) {
+        String chars = "abcdefghjkmnopqrstuvwxyzABCDEFGHJKMNOPQRSTUVWXYZ023456789@";
+        Random random = new Random();
+        int length = random.nextInt((maxLength - minLength) + 1) + minLength;
+
+        StringBuilder username = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            username.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return username.toString();
     }
 
     public void saveUser(String username, String password, String role)

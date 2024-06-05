@@ -2,6 +2,7 @@ package stirling.software.SPDF.controller.api;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -16,11 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -192,6 +189,14 @@ public class UserController {
         userService.updateUserSettings(principal.getName(), updates);
 
         return "redirect:/account"; // Redirect to a page of your choice after updating
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin/saveUserbyAuto")
+    @ResponseBody
+    public List<String> saveUserByAuto() {
+        // Add in batches username and password
+        return userService.saveUser();
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
