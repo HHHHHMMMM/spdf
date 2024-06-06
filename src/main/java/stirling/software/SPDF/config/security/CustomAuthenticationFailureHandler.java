@@ -72,11 +72,6 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
             response.sendRedirect("/login?error=badcredentials");
             return;
         }
-        if (exception.getClass().isAssignableFrom(BadCredentialsException.class)
-                || exception.getClass().isAssignableFrom(UsernameNotFoundException.class)) {
-            response.sendRedirect("/login?error=badcredentials");
-            return;
-        }
 
         super.onAuthenticationFailure(request, response, exception);
     }
