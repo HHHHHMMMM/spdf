@@ -145,7 +145,7 @@ public class PDFToFile {
                                     outputFormat,
                                     "--outdir",
                                     tempOutputDir.toString(),
-                                    tempInputFile.toString()));
+                                    tempInputFile.toString(),"-env:UserInstallation=file:///tmp/libreoffice"));
             ProcessExecutorResult returnCode =
                     ProcessExecutor.getInstance(ProcessExecutor.Processes.LIBRE_OFFICE)
                             .runCommandWithOutputHandling(command);
