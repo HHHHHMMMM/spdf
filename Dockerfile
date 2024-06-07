@@ -20,10 +20,7 @@ ENV DOCKER_ENABLE_SECURITY=false \
     UMASK=022
 
 # JDK for app
-RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/apk/repositories && \
-    echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/community" | tee -a /etc/apk/repositories && \
-    echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" | tee -a /etc/apk/repositories && \
-    apk upgrade --no-cache -a && \
+RUN apk upgrade --no-cache -a && \
     apk add --no-cache \
         ca-certificates \
         tzdata \

@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>console</headerType>
-  <jar>.\build\libs\S-PDF-0.10.1.jar</jar>
-  <outfile>.\Stirling-PDF.exe</outfile>
+  <jar>.\build\libs\EasySpdf-0.25.1.jar</jar>
+  <outfile>.\EasySpdf.exe</outfile>
   <errTitle>Please download Java17</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -13,7 +13,7 @@
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>./src/main/resources/static/favicon.ico</icon>
+  <icon>.\src\main\resources\static\favicon.ico</icon>
   <var>BROWSER_OPEN=true</var>
   <singleInstance>
     <mutexName>Stirling-PDF</mutexName>
