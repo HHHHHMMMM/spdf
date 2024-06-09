@@ -52,8 +52,8 @@ sudo dnf install -y git automake autoconf libtool leptonica-devel pkg-config zli
 针对Debian和Fedora-based系统，你可以使用如下命令对源码进行构建。
 
 ```
-mkdir -p /workspace/.git
-cd /workspace/.git &&\
+mkdir ~/.git
+cd ~/.git &&\
 git clone https://github.com/agl/jbig2enc.git &&\
 cd jbig2enc &&\
 ./autogen.sh &&\
@@ -62,10 +62,10 @@ make &&\
 sudo make install
 ```
 
-注意：
+**注意：**
 
 1. 如果`git clone`使用http无法下载，可以使用ssh方式，ssh的url为：`git@github.com:agl/jbig2enc.git`
-2. 如果报错没有权限读取远程仓库（fatal: Could not read from remote repository），请先ssh-keygen生成key之后，配置到git上。
+2. 如果报错没有权限读取远程仓库（fatal: Could not read from remote repository），请先ssh-keygen生成key之后，配置到github上。
 3. 如果实在无法拉取，可使用软件目录的项目内容。
 
 ### 3. 步骤3：安装其他需要添加的软件
@@ -113,7 +113,7 @@ sudo dnf install -y libreoffice-writer libreoffice-calc libreoffice-impress unpa
 pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint
 ```
 
-pip3安装时可能会报错`no such option: --break-system-packages`,该错误是因为服务器的pip不是最新的，该参数是pip`23.3`版本才引入的，可以尝试更新pip源。解决方案：
+**注意** ：pip3安装时可能会报错`no such option: --break-system-packages`,该错误是因为服务器的pip不是最新的，该参数是pip`23.3`版本才引入的，可以尝试更新pip源。解决方案：
 
 1. 查看pip版本
 
@@ -125,18 +125,19 @@ pip3安装时可能会报错`no such option: --break-system-packages`,该错误�
    pip install --upgrade pip
    ```
 
-Fedora系列的系统执行如下语句：
+3. 再执行`pip install`
 
-```
-sudo dnf install -y libreoffice-writer libreoffice-calc libreoffice-impress unpaper ocrmypdf
-pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint
-```
+   ```
+   pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint --break-system-packages
+   ```
 
-注意(可选)：libreoffice有较多版本，可尽量选择升级最新的版本。最新版本在转换性能上有一定提升。截止目前最新版本的libreoffice版本是24.2.3.2。
+   
+
+**注意(可选)：**libreoffice有较多版本，可尽量选择升级最新的版本。最新版本在转换性能上有一定提升。截止目前最新版本的libreoffice版本是24.2.3.2。
 
 升级方法：
 
-1. 上面命令正常安装
+1. 之前已经使用命令正常安装(已执行)
 
    ```
    sudo apt-get install -y libreoffice unpaper ocrmypdf 
@@ -144,7 +145,7 @@ pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint
 
    然后使用`soffice --version`查看是否是最新版本，截止目前(24.06.09)libreoffice最新版本是24.2.3.
 
-2. 如果不是最新版本，国内源又没有更新最新版本的libreoffice，可以尝试通过官方PPA安装升级最新版本
+2. 如果不是最新版本，国内源又没有更新最新版本的libreoffice，可以尝试通过官方PPA安装升级最新版本.PPA 提供了LibreOffice 的最新稳定版本，而不是开发版本。 这使其成为在Ubuntu 上获取较新LibreOffice 版本的理想选择。
 
    ```
    sudo add-apt-repository ppa:libreoffice/ppa
@@ -156,6 +157,12 @@ pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys xxx  yyy #这里的xxx和yyy是你报错里的public_key
 sudo apt-get update
 sudo add-apt-repository ppa:libreoffice/ppa
+```
+
+3. 安装更新
+
+```
+sudo apt update && sudo apt install libreoffice
 ```
 
 如果部署的服务器在国内， 那么官方PPA源下载安装有一定几率比较慢，如果比较慢耐心点等他安装好即可。
