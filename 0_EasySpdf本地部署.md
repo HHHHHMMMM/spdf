@@ -506,17 +506,15 @@ dpkg-query -W tesseract-ocr-* | sed 's/tesseract-ocr-//g'
 ### 步骤7： 拉起应用
 
 ```
+cd /workspace/easyspdf 
 nohup java -jar /workspace/easypdf/EasySpdf-*.jar >nohup.out&
 ```
 
 友情提示，某些极端情况下，跑大页数、大体量pdf的时候请注意监控内存、cpu使用情况，必要时请采用必要的jvm参数进行限制处理。
 
 ```
-java -Xms8192m -Xmx8192m -XX:MaxDirectMemorySize=4096m -XX:MaxMetaspaceSize=1024m -Xss8192k -jar EasySpdf-*.jar
-
-#针对2c2g的相对安全配置
+#针对2c2g的相对安全配置,其他机器请自行判定
 java -Xms512m -Xmx1024m -XX:MaxDirectMemorySize=256m -XX:MaxMetaspaceSize=128m -Xss512k -jar EasySpdf-*.jar
-
 ```
 
 
