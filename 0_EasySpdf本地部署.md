@@ -124,7 +124,7 @@ pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint --break-syst
 
 升级方法：
 
-1. 之前已经使用命令正常安装(已执行)
+1. **之前已经使用命令正常安装(已执行，这里不再执行)**
 
    ```
    sudo apt-get install -y libreoffice unpaper ocrmypdf 
@@ -163,11 +163,11 @@ sudo apt update && sudo apt install libreoffice
 ` users`表
 
 ```
-CREATE DATABASE  IF NOT EXISTS `stirling_pdf_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `stirling_pdf_db`;
+CREATE DATABASE  IF NOT EXISTS `easy_spdf_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `easy_spdf_db`;
 -- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
--- Host: localhost    Database: stirling_pdf_db
+-- Host: localhost    Database: easy_spdf_db
 -- ------------------------------------------------------
 -- Server version	8.0.37
 
@@ -213,11 +213,11 @@ CREATE TABLE `users` (
 `persistent_logins`表：
 
 ```
-CREATE DATABASE  IF NOT EXISTS `stirling_pdf_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `stirling_pdf_db`;
+CREATE DATABASE  IF NOT EXISTS `easy_spdf_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `easy_spdf_db`;
 -- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
--- Host: localhost    Database: stirling_pdf_db
+-- Host: localhost    Database: easy_spdf_db
 -- ------------------------------------------------------
 -- Server version	8.0.37
 
@@ -419,7 +419,15 @@ CREATE TABLE `authorities` (
 
 #### 5.1 安装构建工具
 
-1. 安装构建工具：把gradle-8.7.zip安装包解压到/opt/gradle下
+1. 下载安装构建工具
+
+   ```
+   wget https://services.gradle.org/distributions/gradle-8.7-all.zip
+   ```
+
+   
+
+1. 把gradle-8.7.zip安装包解压到/opt/gradle下
 
 ```
 sudo unzip -d /opt/gradle gradle-*.zip
