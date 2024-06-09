@@ -9,10 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -33,7 +30,6 @@ public class PDFToFile {
     private static final Logger logger = LoggerFactory.getLogger(PDFToFile.class);
     private static final int TIMEOUT = 180; // 180 seconds or 3 minutes
     private static final int NUM_PROCESSES = 4;
-    private static final String TEMP_DIR = "/tmp/soffice_temp";
 
     public ResponseEntity<byte[]> processPdfToHtml(MultipartFile inputFile)
             throws IOException, InterruptedException {
@@ -105,24 +101,22 @@ public class PDFToFile {
 
     public ResponseEntity<byte[]> processPdfToOfficeFormat(
             MultipartFile inputFile, String outputFormat, String libreOfficeFilter)
-            throws IOException, InterruptedException {
+            throws IOException, InterruptedException{
 
         if (!"application/pdf".equals(inputFile.getContentType())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        // Get the original PDF file name without the extension
         String originalPdfFileName = Filenames.toSimpleFileName(inputFile.getOriginalFilename());
 
         if (originalPdfFileName == null || "".equals(originalPdfFileName.trim())) {
             originalPdfFileName = "output.pdf";
         }
-        // Assume file is pdf if no extension
         String pdfBaseName = originalPdfFileName;
         if (originalPdfFileName.contains(".")) {
             pdfBaseName = originalPdfFileName.substring(0, originalPdfFileName.lastIndexOf('.'));
         }
-        // Validate output format
+
         List<String> allowedFormats =
                 Arrays.asList("doc", "docx", "odt", "ppt", "pptx", "odp", "rtf", "xml", "txt:Text");
         if (!allowedFormats.contains(outputFormat)) {
@@ -133,81 +127,54 @@ public class PDFToFile {
         Path tempOutputDir = null;
         byte[] fileBytes;
         String fileName = "temp.file";
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(NUM_PROCESSES);
 
         try {
-            // Save the uploaded file to a temporary location
             tempInputFile = Files.createTempFile("input_", ".pdf");
             inputFile.transferTo(tempInputFile);
 
-            // Prepare the output directory
             tempOutputDir = Files.createTempDirectory("output_");
-            // execute the LibreOffice command with their own dir
-            Path finalTempOutputDir = tempOutputDir;
-            Path finalTempInputFile = tempInputFile;
-            executorService.submit(
-                    () -> {
-                        // create the runtime dir
-                        String tempInstanceDir = TEMP_DIR + "/soffice_" + UUID.randomUUID();
-                        new File(tempInstanceDir).mkdirs();
-                        ProcessBuilder pb =
-                                new ProcessBuilder(
-                                        "soffice",
-                                        "--headless",
-                                        "--nologo",
-                                        "--convert-to",
-                                        "doc",
-                                        "--outdir",
-                                        finalTempOutputDir.toString(),
-                                        finalTempInputFile.toString(),
-                                        "-env:UserInstallation=file://" + tempInstanceDir);
 
-                        try {
-                            Process process = pb.start();
-                            executorService.schedule(
-                                    () -> {
-                                        if (process.isAlive()) {
-                                            process.destroy();
-                                            logger.error(
-                                                    "soffice process for "
-                                                            + finalTempInputFile.getFileName()
-                                                            + " timed out and was killed.");
-                                        }
-                                    },
-                                    TIMEOUT,
-                                    TimeUnit.SECONDS);
-                            process.waitFor();
-                        } catch (IOException | InterruptedException e) {
-                            e.printStackTrace();
-                        } finally {
-                            deleteDirectory(new File(tempInstanceDir));
-                        }
-                    });
+            List<String> command =
+                    new ArrayList<>(
+                            Arrays.asList(
+                                    "soffice",
+                                    "--headless",
+                                    "--nologo",
+                                    "--infilter=" + libreOfficeFilter,
+                                    "--convert-to",
+                                    outputFormat,
+                                    "--outdir",
+                                    tempOutputDir.toString(),
+                                    tempInputFile.toString()));
+            logger.info("Executing command: " + command);
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            Process process = processBuilder.start();
+            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+            Future<?> processFuture =
+                    scheduler.submit(
+                            () -> {
+                                try {
+                                    process.waitFor();
+                                } catch (Exception e) {
+                                    logger.error(e.getMessage());
+                                    Thread.currentThread().interrupt();
+                                }
+                            });
 
-            executorService.shutdown();
+            try {
+                processFuture.get(4, TimeUnit.MINUTES); // 等待4分钟
+            } catch (TimeoutException e) {
+                process.destroy(); // 超时则杀死进程
+                throw new RuntimeException("Conversion process took too long and was terminated.");
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            } finally {
+                scheduler.shutdown();
+            }
 
-            //            // Run the LibreOffice command
-            //            List<String> command =
-            //                    new ArrayList<>(
-            //                            Arrays.asList(
-            //                                    "soffice",
-            //                                    "--infilter=" + libreOfficeFilter,
-            //                                    "--convert-to",
-            //                                    outputFormat,
-            //                                    "--outdir",
-            //                                    tempOutputDir.toString(),
-            //
-            // tempInputFile.toString(),"-env:UserInstallation=file:///tmp/libreoffice"));
-            //            ProcessExecutorResult returnCode =
-            //
-            // ProcessExecutor.getInstance(ProcessExecutor.Processes.LIBRE_OFFICE)
-            //                            .runCommandWithOutputHandling(command);
-
-            // Get output files
             List<File> outputFiles = Arrays.asList(tempOutputDir.toFile().listFiles());
 
             if (outputFiles.size() == 1) {
-                // Return single output file
                 File outputFile = outputFiles.get(0);
                 if ("txt:Text".equals(outputFormat)) {
                     outputFormat = "txt";
@@ -215,7 +182,6 @@ public class PDFToFile {
                 fileName = pdfBaseName + "." + outputFormat;
                 fileBytes = FileUtils.readFileToByteArray(outputFile);
             } else {
-                // Return output files in a ZIP archive
                 fileName = pdfBaseName + "To" + outputFormat + ".zip";
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 try (ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
@@ -238,26 +204,11 @@ public class PDFToFile {
             }
 
         } finally {
-            // Clean up the temporary files
             Files.deleteIfExists(tempInputFile);
             if (tempOutputDir != null) FileUtils.deleteDirectory(tempOutputDir.toFile());
         }
-        System.out.println("fileBytes=" + fileBytes.length);
+        logger.info("fileBytes=" + fileBytes.length);
         return WebResponseUtils.bytesToWebResponse(
                 fileBytes, fileName, MediaType.APPLICATION_OCTET_STREAM);
-    }
-
-    private static void deleteDirectory(File dir) {
-        File[] files = dir.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    deleteDirectory(file);
-                } else {
-                    file.delete();
-                }
-            }
-        }
-        dir.delete();
     }
 }
