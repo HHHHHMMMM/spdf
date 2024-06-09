@@ -12,7 +12,7 @@
 
 ## 1. 系统参数
 
-1. 4核(vCPU)32 GiB服务器，系统Ubuntu 22.04 64位 UEFI版，一个基本ESSD云盘(正常nas也可)
+1. 4核(vCPU)32 GiB服务器，系统Ubuntu 22.04 64位 UEFI版，一个基本ESSD云盘(正常nas也可)，**要有基本网络可以下载依赖。**
 2. mysql8.0(首页登录使用)
 
 ## 2. 步骤
@@ -39,12 +39,6 @@
 ```
 sudo apt-get update
 sudo apt-get install -y git  automake  autoconf  libtool  libleptonica-dev  pkg-config zlib1g-dev make g++ openjdk-21-jdk python3 python3-pip
-```
-
-针对 Fedora-based 系统，可以用如下命令：
-
-```
-sudo dnf install -y git automake autoconf libtool leptonica-devel pkg-config zlib-devel make gcc-c++ java-21-openjdk python3 python3-pip
 ```
 
 ### 2. 步骤2：Clone and Build jbig2enc(只针对要使用OCR功能的情况)
@@ -106,13 +100,6 @@ sudo apt-get install -y libreoffice unpaper ocrmypdf
 pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint --break-system-packages
 ```
 
-Fedora系列的系统执行如下语句：
-
-```
-sudo dnf install -y libreoffice-writer libreoffice-calc libreoffice-impress unpaper ocrmypdf
-pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint
-```
-
 **注意** ：pip3安装时可能会报错`no such option: --break-system-packages`,该错误是因为服务器的pip不是最新的，该参数是pip`23.3`版本才引入的，可以尝试更新pip源。解决方案：
 
 1. 查看pip版本
@@ -171,7 +158,7 @@ sudo apt update && sudo apt install libreoffice
 
 ### 4. 创建库表
 
-​	在mysql中建库表sql如下：
+#### 4.1在mysql中建库表sql如下：
 
 ` users`表
 
@@ -395,6 +382,39 @@ CREATE TABLE `authorities` (
 
 ```
 
+#### 4.2 配置密文加密工具并生成数据库密码密文
+
+为了保证生产安全，数据库密码采用了jasypt来进行加密。因此在代码里配置数据库密码是其实是经过jasypt转换后的密文，故需要先行进行数据库密文的解密。
+
+以下是配置步骤：
+
+1. 下载jasypt(或在软件包中找到jasypt-1.9.3-dist.zip)
+
+   ```
+   wget https://github.com/jasypt/jasypt/releases/download/jasypt-1.9.3/jasypt-1.9.3-dist.zip
+   ```
+
+2. 解压jasypt
+
+   ```
+   unzip jasypt-1.9.3-dist.zip -d ~/jasypt
+   ```
+
+3. 使用jasypt工具进行加密**（请替换第三条命令的`your_plain_password`和`encryption_password`）**
+
+   ```
+   cd ~/jasypt/jasypt-1.9.3/bin &&\
+   chmod +x ./* &&\
+   ./encrypt.sh input="your_plain_password" password="encryption_password"
+   ```
+
+   其中两个参数说明如下：
+
+   - `input`：你要加密的文本。
+   - `password`：用于加密的密码（密钥），也可以理解为一个加密因子 ，后期解密会根据这个加密因子来解密。
+
+   执行完毕后请存好加密后的密文和加密因子。
+
 ### 5. 步骤4：Clone and Build Easyspdf
 
 #### 5.1 安装构建工具
@@ -454,6 +474,24 @@ vim application.properties
 ```
 
 针对数据库连接串、用户名、密码进行修改。
+
+本项目用户名密码涉及配置如下：
+
+```
+spring.datasource.username=username
+spring.datasource.password=ENC(xxxx)
+jasypt.encryptor.password=key
+jasypt.encryptor.algorithm=PBEWithMD5AndDES
+jasypt.encryptor.iv-generator-classname=org.jasypt.iv.NoIvGenerator
+```
+
+说明如下：
+
+`spring.datasource.username`:数据库用户名
+
+`spring.datasource.password`:这里数据库密码使用jasypt加密，`ENC(xxxx)`为密文，在项目启动时，springboot会解密ENC包裹住的密文，这里就填写ENC(<4.2输出的密文>)
+
+`jasypt.encryptor.password`：jasypt加密的加密因子(上面4.2有提到过)
 
 ```
 cd ~/.git/spdf &&\
