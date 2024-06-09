@@ -101,6 +101,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jetty:3.2.4'
     
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.2.4'
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
 
     if (System.getenv('DOCKER_ENABLE_SECURITY') != 'false') {
         implementation 'org.springframework.boot:spring-boot-starter-security:3.2.4'

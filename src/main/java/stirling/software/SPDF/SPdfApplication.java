@@ -17,6 +17,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
+
 import io.github.pixee.security.SystemCommand;
 
 import jakarta.annotation.PostConstruct;
@@ -25,6 +27,7 @@ import stirling.software.SPDF.model.ApplicationProperties;
 
 @SpringBootApplication
 @EnableScheduling
+@EnableEncryptableProperties
 public class SPdfApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(SPdfApplication.class);
