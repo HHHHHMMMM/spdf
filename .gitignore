@@ -19,7 +19,8 @@ pipeline/watchedFolders/
 pipeline/finishedFolders/
 #### Stirling-PDF Files ###
 watchedFolders/
-
+configs/
+customFiles/
 
 # Gradle
 .gradle
@@ -126,3 +127,4 @@ watchedFolders/
 
 #cucumber
 /cucumber/reports/**
+/configs/

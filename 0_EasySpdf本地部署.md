@@ -466,7 +466,6 @@ build成功后，项目根目录下会增加一个build目录，打好的可运�
 sudo mkdir -p /workspace/easyspdf &&\
 sudo mv ./build/libs/EasySpdf-*.jar /workspace/easyspdf &&\
 sudo mv scripts /workspace/easyspdf &&\
-sudo mv configs /workspace/easyspdf &&\
 echo "Scripts installed."
 ```
 

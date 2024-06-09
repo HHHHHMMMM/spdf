@@ -101,7 +101,7 @@ public class PDFToFile {
 
     public ResponseEntity<byte[]> processPdfToOfficeFormat(
             MultipartFile inputFile, String outputFormat, String libreOfficeFilter)
-            throws IOException, InterruptedException{
+            throws IOException, InterruptedException {
 
         if (!"application/pdf".equals(inputFile.getContentType())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
