@@ -8,7 +8,7 @@
 
 它应该可以在大多数Linux发行版和MacOS上工作。
 
-对于Windows，您可能需要使用Windows Subsystem For Linux (WSL)来完成某些步骤。如果你的发行版有旧的或者不是所有的包，理论上你可以使用一个Distrobox/Toolbox。或者使用Docker容器。
+对于Windows，可能需要使用Windows Subsystem For Linux (WSL)来完成某些步骤。如果你的发行版有旧的或者不是所有的包，理论上你可以使用一个Distrobox/Toolbox，或者使用Docker容器。
 
 ## 1. 系统参数
 
@@ -463,17 +463,14 @@ build成功后，项目根目录下会增加一个build目录，打好的可运�
 还必须将项目中的Script文件夹移动到该目录,使用OpenCV的python脚本需要此文件夹。
 
 ```yaml
-sudo mkdir /workspace/easyspdf &&\
+sudo mkdir -p /workspace/easyspdf &&\
 sudo mv ./build/libs/EasySpdf-*.jar /workspace/easyspdf &&\
 sudo mv scripts /workspace/easyspdf &&\
+sudo mv configs /workspace/easyspdf &&\
 echo "Scripts installed."
 ```
 
-
-
-
-
-### 步骤6： 其他文件安装(如果要使用OCR)
+### 步骤7： 其他文件安装(如果要使用OCR)
 
 如果计划使用OCR功能，则在运行非英语扫描时可能需要为Tesseract安装语言包。
 
@@ -489,10 +486,9 @@ echo "Scripts installed."
 
 ```
 sudo apt update
-sudo apt upgrade
 sudo apt install -y 'tesseract-ocr-*'
 #查看安装好的包
-dpkg-query -W tesseract-ocr- | sed 's/tesseract-ocr-//g'
+dpkg-query -W tesseract-ocr-* | sed 's/tesseract-ocr-//g'
 ```
 
 下载好的包应该是在/usr/share/tesseract-ocr/4.00/tessdata下，确保`eng.traineddata`文件在，这个是必须的。
