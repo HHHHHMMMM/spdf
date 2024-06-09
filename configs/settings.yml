@@ -47,7 +47,7 @@ system:
 
 ui:
   appName: "EasySpdf" # Application's visible name
-  homeDescription: "EasySpdf is a robust, locally hosted web-based tool for comprehensive PDF manipulation powered by Stirling-pdf, ensuring all operations are performed securely on the client side without outbound tracking." # Short description or tagline shown on homepage.
+  homeDescription: "EasySpdf是一个强大的，本地托管的基于web的工具，用于全面的PDF操作，由Stirling-pdf提供支持，确保所有操作都在客户端安全执行，Easypdf不会保留任何个人数据或内容。" # Short description or tagline shown on homepage.
   appNameNavbar: "EasySpdf" # Name displayed on the navigation bar
 
 endpoints:
