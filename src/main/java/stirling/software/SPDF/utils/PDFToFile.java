@@ -9,6 +9,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -27,6 +31,9 @@ import stirling.software.SPDF.utils.ProcessExecutor.ProcessExecutorResult;
 
 public class PDFToFile {
     private static final Logger logger = LoggerFactory.getLogger(PDFToFile.class);
+    private static final int TIMEOUT = 180; // 180 seconds or 3 minutes
+    private static final int NUM_PROCESSES = 4;
+    private static final String TEMP_DIR = "/tmp/soffice_temp";
 
     public ResponseEntity<byte[]> processPdfToHtml(MultipartFile inputFile)
             throws IOException, InterruptedException {
@@ -126,6 +133,7 @@ public class PDFToFile {
         Path tempOutputDir = null;
         byte[] fileBytes;
         String fileName = "temp.file";
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(NUM_PROCESSES);
 
         try {
             // Save the uploaded file to a temporary location
@@ -134,21 +142,66 @@ public class PDFToFile {
 
             // Prepare the output directory
             tempOutputDir = Files.createTempDirectory("output_");
+            // execute the LibreOffice command with their own dir
+            Path finalTempOutputDir = tempOutputDir;
+            Path finalTempInputFile = tempInputFile;
+            executorService.submit(
+                    () -> {
+                        // create the runtime dir
+                        String tempInstanceDir = TEMP_DIR + "/soffice_" + UUID.randomUUID();
+                        new File(tempInstanceDir).mkdirs();
+                        ProcessBuilder pb =
+                                new ProcessBuilder(
+                                        "soffice",
+                                        "--headless",
+                                        "--nologo",
+                                        "--convert-to",
+                                        "doc",
+                                        "--outdir",
+                                        finalTempOutputDir.toString(),
+                                        finalTempInputFile.toString(),
+                                        "-env:UserInstallation=file://" + tempInstanceDir);
 
-            // Run the LibreOffice command
-            List<String> command =
-                    new ArrayList<>(
-                            Arrays.asList(
-                                    "soffice",
-                                    "--infilter=" + libreOfficeFilter,
-                                    "--convert-to",
-                                    outputFormat,
-                                    "--outdir",
-                                    tempOutputDir.toString(),
-                                    tempInputFile.toString(),"-env:UserInstallation=file:///tmp/libreoffice"));
-            ProcessExecutorResult returnCode =
-                    ProcessExecutor.getInstance(ProcessExecutor.Processes.LIBRE_OFFICE)
-                            .runCommandWithOutputHandling(command);
+                        try {
+                            Process process = pb.start();
+                            executorService.schedule(
+                                    () -> {
+                                        if (process.isAlive()) {
+                                            process.destroy();
+                                            logger.error(
+                                                    "soffice process for "
+                                                            + finalTempInputFile.getFileName()
+                                                            + " timed out and was killed.");
+                                        }
+                                    },
+                                    TIMEOUT,
+                                    TimeUnit.SECONDS);
+                            process.waitFor();
+                        } catch (IOException | InterruptedException e) {
+                            e.printStackTrace();
+                        } finally {
+                            deleteDirectory(new File(tempInstanceDir));
+                        }
+                    });
+
+            executorService.shutdown();
+
+            //            // Run the LibreOffice command
+            //            List<String> command =
+            //                    new ArrayList<>(
+            //                            Arrays.asList(
+            //                                    "soffice",
+            //                                    "--infilter=" + libreOfficeFilter,
+            //                                    "--convert-to",
+            //                                    outputFormat,
+            //                                    "--outdir",
+            //                                    tempOutputDir.toString(),
+            //
+            // tempInputFile.toString(),"-env:UserInstallation=file:///tmp/libreoffice"));
+            //            ProcessExecutorResult returnCode =
+            //
+            // ProcessExecutor.getInstance(ProcessExecutor.Processes.LIBRE_OFFICE)
+            //                            .runCommandWithOutputHandling(command);
 
             // Get output files
             List<File> outputFiles = Arrays.asList(tempOutputDir.toFile().listFiles());
@@ -192,5 +245,19 @@ public class PDFToFile {
         System.out.println("fileBytes=" + fileBytes.length);
         return WebResponseUtils.bytesToWebResponse(
                 fileBytes, fileName, MediaType.APPLICATION_OCTET_STREAM);
+    }
+
+    private static void deleteDirectory(File dir) {
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+        }
+        dir.delete();
     }
 }

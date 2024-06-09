@@ -18,8 +18,6 @@ version.properties
 pipeline/watchedFolders/
 pipeline/finishedFolders/
 #### Stirling-PDF Files ###
-customFiles/
-configs/
 watchedFolders/
 
 

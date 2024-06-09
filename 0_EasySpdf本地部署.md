@@ -13,7 +13,7 @@
 ## 1. 系统参数
 
 1. 4核(vCPU)32 GiB服务器，系统Ubuntu 22.04 64位 UEFI版，一个基本ESSD云盘(正常nas也可)
-2. mysql8.0
+2. mysql8.0(首页登录使用)
 
 ## 2. 步骤
 
@@ -62,6 +62,12 @@ make &&\
 sudo make install
 ```
 
+注意：
+
+1. 如果`git clone`使用http无法下载，可以使用ssh方式，ssh的url为：`git@github.com:agl/jbig2enc.git`
+2. 如果报错没有权限读取远程仓库（fatal: Could not read from remote repository），请先ssh-keygen生成key之后，配置到git上。
+3. 如果实在无法拉取，可使用软件目录的项目内容。
+
 ### 3. 步骤3：安装其他需要添加的软件
 
 接下来我们需要为实现具体功能来安装 LibreOffice for conversions, ocrmypdf for OCR, and opencv。
@@ -106,6 +112,55 @@ Fedora系列的系统执行如下语句：
 sudo dnf install -y libreoffice-writer libreoffice-calc libreoffice-impress unpaper ocrmypdf
 pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint
 ```
+
+pip3安装时可能会报错`no such option: --break-system-packages`,该错误是因为服务器的pip不是最新的，该参数是pip`23.3`版本才引入的，可以尝试更新pip源。解决方案：
+
+1. 查看pip版本
+
+   `pip --version`
+
+2. 更新pip
+
+   ```
+   pip install --upgrade pip
+   ```
+
+Fedora系列的系统执行如下语句：
+
+```
+sudo dnf install -y libreoffice-writer libreoffice-calc libreoffice-impress unpaper ocrmypdf
+pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint
+```
+
+注意(可选)：libreoffice有较多版本，可尽量选择升级最新的版本。最新版本在转换性能上有一定提升。截止目前最新版本的libreoffice版本是24.2.3.2。
+
+升级方法：
+
+1. 上面命令正常安装
+
+   ```
+   sudo apt-get install -y libreoffice unpaper ocrmypdf 
+   ```
+
+   然后使用`soffice --version`查看是否是最新版本，截止目前(24.06.09)libreoffice最新版本是24.2.3.
+
+2. 如果不是最新版本，国内源又没有更新最新版本的libreoffice，可以尝试通过官方PPA安装升级最新版本
+
+   ```
+   sudo add-apt-repository ppa:libreoffice/ppa
+   ```
+
+​		如果报错：`GPG error: http://cz.archive.ubuntu.com/ubuntu xenial InRelease: The following signatures couldn't be verified because the public key is not available:NO_PUBKEY xxx yyy`表明你的 Ubuntu 系统在从 `http://cz.archive.ubuntu.com/ubuntu` 获取软件包时，无法验证某些签名，因为缺少相应的公钥。可以通过以下步骤解决这个问题：
+
+```
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys xxx  yyy #这里的xxx和yyy是你报错里的public_key
+sudo apt-get update
+sudo add-apt-repository ppa:libreoffice/ppa
+```
+
+如果部署的服务器在国内， 那么官方PPA源下载安装有一定几率比较慢，如果比较慢耐心点等他安装好即可。
+
+3. 安装完成后使用`soffice --version`可以查看版本，如果是24.2.3(最新版本)即可。
 
 ### 4. 创建库表
 
@@ -380,25 +435,27 @@ source .bashrc
 #### 5.2 clone and build Easyspdf
 
 ```
-cd /workspace/.git &&\
-git@github.com:HHHHHMMMM/spdf.git 
+cd ~/.git &&\
+git clone git@github.com:HHHHHMMMM/spdf.git 
 ```
 
 修改项目里的application.properties
 
 ```
-cd /workspace/.git/spdf/src/main/resources
+cd ~/.git/spdf/src/main/resources
 vim application.properties
 ```
 
 针对数据库连接串、用户名、密码进行修改。
 
 ```
-cd /workspace/.git/spdf &&\
+cd ~/.git/spdf &&\
 gradle clean build --refresh-dependencies
 ```
 
-使用--refresh-dependencies来让依赖下载的时候使用刚更新的国内源
+使用--refresh-dependencies来让依赖下载的时候使用刚更新的国内源。此时正在下载依赖，第一次下载内容比较多，可能需要耗费一定时间。
+
+build成功后，项目根目录下会增加一个build目录，打好的可运行的jar包就在build/libs里面。
 
 ### 步骤6. 把build好的jar包放到目标目录(应用执行目录)
 
