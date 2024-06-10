@@ -5,7 +5,6 @@ if [ ! -z "$PUID" ] && [ "$PUID" != "$(id -u stirlingpdfuser)" ]; then
     usermod -o -u "$PUID" stirlingpdfuser || true
 fi
 
-
 if [ ! -z "$PGID" ] && [ "$PGID" != "$(getent group stirlingpdfgroup | cut -d: -f3)" ]; then
     groupmod -o -g "$PGID" stirlingpdfgroup || true
 fi
@@ -16,17 +15,13 @@ if [[ "$INSTALL_BOOK_AND_ADVANCED_HTML_OPS" == "true" && "$FAT_DOCKER" != "true"
 fi
 
 if [[ "$FAT_DOCKER" != "true" ]]; then
-  /scripts/download-security-jar.sh	
-fi
-
-if [[ -n "$LANGS" ]]; then
-  /scripts/installFonts.sh $LANGS
+  /scripts/download-security-jar.sh
 fi
 
 echo "Setting permissions and ownership for necessary directories..."
 # Attempt to change ownership of directories and files
 if chown -R stirlingpdfuser:stirlingpdfgroup $HOME /logs /scripts /usr/share/fonts/opentype/noto /configs /customFiles /pipeline /app.jar; then
-	chmod -R 755 /logs /scripts /usr/share/fonts/opentype/noto /configs /customFiles /pipeline /app.jar || true
+    chmod -R 755 /logs /scripts /usr/share/fonts/opentype/noto /configs /customFiles /pipeline /app.jar || true
     # If chown succeeds, execute the command as stirlingpdfuser
     exec su-exec stirlingpdfuser "$@"
 else

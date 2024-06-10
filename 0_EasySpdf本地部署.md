@@ -118,9 +118,7 @@ pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint --break-syst
    pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint --break-system-packages
    ```
 
-   
-
-**注意(可选)：**libreoffice有较多版本，可尽量选择升级最新的版本。最新版本在转换性能上有一定提升。截止目前最新版本的libreoffice版本是24.2.3.2。
+   **注意(可选)：**libreoffice有较多版本，可尽量选择升级最新的版本。最新版本在转换性能上有一定提升。截止目前最新版本的libreoffice版本是24.2.3.2。
 
 升级方法：
 

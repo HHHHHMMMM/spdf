@@ -5,7 +5,6 @@ FROM alpine:3.20.0
 COPY scripts /scripts
 COPY pipeline /pipeline
 COPY src/main/resources/static/fonts/*.ttf /usr/share/fonts/opentype/noto/
-#COPY src/main/resources/static/fonts/*.otf /usr/share/fonts/opentype/noto/
 COPY build/libs/*.jar app.jar
 
 ARG VERSION_TAG
@@ -20,7 +19,10 @@ ENV DOCKER_ENABLE_SECURITY=false \
     UMASK=022
 
 # JDK for app
-RUN apk upgrade --no-cache -a && \
+RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/apk/repositories && \
+    echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/community" | tee -a /etc/apk/repositories && \
+    echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" | tee -a /etc/apk/repositories && \
+    apk upgrade --no-cache -a && \
     apk add --no-cache \
         ca-certificates \
         tzdata \
@@ -32,26 +34,27 @@ RUN apk upgrade --no-cache -a && \
         openssl \
         openssl-dev \
         openjdk21-jre \
-# Doc conversion
         libreoffice \
-# pdftohtml
         poppler-utils \
-# OCR MY PDF (unpaper for descew and other advanced featues)
         ocrmypdf \
         tesseract-ocr-data-eng \
-# CV
+        tesseract-ocr-data-spa \
+        tesseract-ocr-data-deu \
+        tesseract-ocr-data-ara \
+        tesseract-ocr-data-chi_sim \
+        tesseract-ocr-data-chi_tra \
+        tesseract-ocr-data-jpn \
+        tesseract-ocr-data-kor \
+        tesseract-ocr-data-rus \
         py3-opencv \
-# python3/pip
         python3 && \
     wget https://bootstrap.pypa.io/get-pip.py -qO - | python3 - --break-system-packages --no-cache-dir --upgrade && \
-# uno unoconv and HTML
     pip install --break-system-packages --no-cache-dir --upgrade unoconv WeasyPrint && \
     mv /usr/share/tessdata /usr/share/tessdata-original && \
     mkdir -p $HOME /configs /logs /customFiles /pipeline/watchedFolders /pipeline/finishedFolders && \
     fc-cache -f -v && \
     chmod +x /scripts/* && \
     chmod +x /scripts/init.sh && \
-# User permissions
     addgroup -S stirlingpdfgroup && adduser -S stirlingpdfuser -G stirlingpdfgroup && \
     chown -R stirlingpdfuser:stirlingpdfgroup $HOME /scripts /usr/share/fonts/opentype/noto /configs /customFiles /pipeline && \
     chown stirlingpdfuser:stirlingpdfgroup /app.jar && \
