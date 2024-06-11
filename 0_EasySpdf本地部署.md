@@ -1,4 +1,4 @@
-#  EasySpdf本地部署
+#  EasySpdf本地部署(必须有网络，依赖下载依赖于网络)
 
 要在没有Docker/Podman的情况下运行应用程序，可能需要手动安装所有依赖项并构建必要的组件。
 
@@ -60,7 +60,6 @@ sudo make install
 
 1. 如果`git clone`使用http无法下载，可以使用ssh方式，ssh的url为：`git@github.com:agl/jbig2enc.git`
 2. 如果报错没有权限读取远程仓库（fatal: Could not read from remote repository），请先ssh-keygen生成key之后，配置到github上。
-3. 如果实在无法拉取，可使用软件目录的项目内容。
 
 ### 3. 步骤3：安装其他需要添加的软件
 
@@ -403,7 +402,7 @@ CREATE TABLE `authorities` (
    ```
    cd ~/jasypt/jasypt-1.9.3/bin &&\
    chmod +x ./* &&\
-   ./encrypt.sh input="your_plain_password" password="encryption_password"
+   ./encrypt.sh input=‘your_plain_password’ password=‘encryption_password’
    ```
 
    其中两个参数说明如下：
@@ -411,7 +410,7 @@ CREATE TABLE `authorities` (
    - `input`：你要加密的文本。
    - `password`：用于加密的密码（密钥），也可以理解为一个加密因子 ，后期解密会根据这个加密因子来解密。
 
-   执行完毕后请存好加密后的密文和加密因子。
+   **执行完毕后请存好加密后的密文和加密因子。**
 
 ### 5. 步骤4：Clone and Build Easyspdf
 
@@ -541,10 +540,6 @@ dpkg-query -W tesseract-ocr-* | sed 's/tesseract-ocr-//g'
 
 下载好的包应该是在/usr/share/tesseract-ocr/4.00/tessdata下，确保`eng.traineddata`文件在，这个是必须的。
 
-
-
-
-
 ### 步骤7： 拉起应用
 
 ```
@@ -559,7 +554,7 @@ nohup java -jar /workspace/easypdf/EasySpdf-*.jar >nohup.out&
 java -Xms512m -Xmx1024m -XX:MaxDirectMemorySize=256m -XX:MaxMetaspaceSize=128m -Xss512k -jar EasySpdf-*.jar
 ```
 
-
+应用启动日志在./nohup.out里。日常日志在jar包同级目录./logs下。本文档具体中具体路径为`/workspace/easyspdf/logs`。
 
 ## Windows版本打包
 
@@ -590,6 +585,42 @@ launch4j配置文件在项目根目录下，可自行执行配置。
 - pdf-to-rtf
 
 
+
+## 客户端定制配置
+
+#### easyspdf支持用户自定义配置
+
+在步骤七拉起应用后，应用同级目录下会生成`logs`,`pipeline`,`configs`,`customFiles`目录（如若没有手动生成，会自动生成一份。如若已经手动生成了，则会直接使用手动生成的文件）。
+
+其中，
+
+- ##### configs：
+
+该目录下有两个配置文件：
+
+1. `setting.yml`是一个easyspdf外置的配置文件，配置了一些常用开关/配置，里面有每种配置的解释说明。
+
+​       这里提一嘴easyspdf的登录功能。默认情况下，easyspdf并没有开启登录功能，即应用拉起来后访问应用可以直接使用。如果要开启easyspdf的登录，则将`security.enableLogin`改为true，并重启应用，则此时访问应用会进入到登录页面。默认情况下，你可以使用登录初始用户：admin，密码:stirling来登入。初次登入需要强制修改密码。
+
+2. `custom_setting.yml`是spring项目的外置配置文件，熟悉java和spring的用户可以自行在这里定义配置来修改默认配置。
+
+此项目当然支持springboot的默认约定，即：直接读取并使用jar包执行目录同级或执行目录config/子目录下的配置文件。
+
+此文档中，由于jar包执行目录是`/workspace/easyspdf `，故外置配置文件`application.properties`应该放置在同级目录`/workspace/easyspdf`或`/workspace/easyspdf/config`目录下。且优先级`/workspace/easyspdf/config`大于`/workspace/easyspdf`.
+
+- ##### logs：
+
+​	存放了应用日志
+
+- ##### customFiles：
+
+  针对easyspdf已有的页面、logo可以进行自定义修改。它相当于一个外置的resources目录。当你想修改某个存在的页面的时候，可以将该页面放置到`customFiles/templates`目录下(项目使用thymeleaf写前端页面)，项目启动的时候，会用这里的页面来替换默认页面。
+
+  如果想修改logo，可以将要替换的logo放置到`customeFils/static`目录下，项目运行时会将新logo替换掉项目默认的favicon.svg。
+
+- `pipeline`:
+
+  流水线高级功能。
 
 
 

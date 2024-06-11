@@ -72,7 +72,7 @@ public class SPdfApplication {
         app.addInitializers(new ConfigInitializer());
         Map<String, String> propertyFiles = new HashMap<>();
 
-        // stirling pdf settings file
+        // Easyspdf settings file
         if (Files.exists(Paths.get("configs/settings.yml"))) {
             propertyFiles.put("spring.config.additional-location", "file:configs/settings.yml");
         } else {
@@ -119,7 +119,7 @@ public class SPdfApplication {
     }
 
     private static void printStartupLogs() {
-        logger.info("Stirling-PDF Started.");
+        logger.info("Easyspdf Started.");
         String url = "http://localhost:" + getStaticPort();
         logger.info("Navigate to {}", url);
     }

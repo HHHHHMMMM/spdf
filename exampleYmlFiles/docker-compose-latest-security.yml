@@ -1,7 +1,7 @@
 version: '3.3'
 services:
-  stirling-pdf:
-    container_name: Stirling-PDF-Security
+  EasysPDF:
+    container_name: EasysPDF-Security
     image: frooodle/s-pdf:latest
     deploy:
       resources:
@@ -25,9 +25,9 @@ services:
       PGID: 1002
       UMASK: "022"
       SYSTEM_DEFAULTLOCALE: en-US
-      UI_APPNAME: Stirling-PDF
-      UI_HOMEDESCRIPTION: Demo site for Stirling-PDF Latest with Security
-      UI_APPNAMENAVBAR: Stirling-PDF Latest
+      UI_APPNAME: EasysPDF
+      UI_HOMEDESCRIPTION: Demo site for EasysPDF Latest with Security
+      UI_APPNAMENAVBAR: EasysPDF Latest
       SYSTEM_MAXFILESIZE: "100"
       METRICS_ENABLED: "true"
       SYSTEM_GOOGLEVISIBILITY: "true"

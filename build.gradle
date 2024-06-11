@@ -51,7 +51,7 @@ openApi {
 launch4j {
   icon = "${projectDir}/src/main/resources/static/favicon.ico"
 
-  outfile="Stirling-PDF.exe"
+  outfile="EasysPDF.exe"
   headerType="console"
   jarTask = tasks.bootJar
 
@@ -60,14 +60,14 @@ launch4j {
   variables=["BROWSER_OPEN=true", "ENDPOINTS_GROUPS_TO_REMOVE=CLI"]
   jreMinVersion="17"
 
-  mutexName="Stirling-PDF"
-  windowTitle="Stirling-PDF"
+  mutexName="EasysPDF"
+  windowTitle="EasysPDF"
 
-  messagesStartupError="An error occurred while starting Stirling-PDF"
+  messagesStartupError="An error occurred while starting EasysPDF"
   //messagesJreNotFoundError="This application requires a Java Runtime Environment, Please download Java 17."
   messagesJreVersionError="You are running the wrong version of Java, Please download Java 21."
   messagesLauncherError="Java is corrupted. Please uninstall and then install  Java 21."
-  messagesInstanceAlreadyExists="Stirling-PDF is already running."
+  messagesInstanceAlreadyExists="EasysPDF is already running."
 }
 
 spotless {
@@ -110,7 +110,7 @@ dependencies {
         implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:3.2.4'
 
         //2.2.x requires rebuild of DB file.. need migration path
-       // implementation "com.h2database:h2:2.1.214"
+        implementation "com.h2database:h2:2.1.214"
     }
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.4'
@@ -188,7 +188,7 @@ tasks.register('writeVersion') {
 
 swaggerhubUpload {
     //dependsOn generateOpenApiDocs  // Depends on your task generating Swagger docs
-    api 'Stirling-PDF'  // The name of your API on SwaggerHub
+    api 'EasysPDF'  // The name of your API on SwaggerHub
     owner 'Frooodle'  // Your SwaggerHub username (or organization name)
     version project.version  // The version of your API
     inputFile './SwaggerDoc.json'  // The path to your Swagger docs
@@ -199,7 +199,7 @@ swaggerhubUpload {
 jar {
     enabled = false
     manifest {
-        attributes 'Implementation-Title': 'Stirling-PDF',
+        attributes 'Implementation-Title': 'EasysPDF',
                    'Implementation-Version': project.version
     }
 

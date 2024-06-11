@@ -1,7 +1,7 @@
 version: '3.3'
 services:
-  stirling-pdf:
-    container_name: Stirling-PDF-Ultra-Lite-Security
+  EasysPDF:
+    container_name: EasysPDF-Ultra-Lite-Security
     image: frooodle/s-pdf:latest-ultra-lite
     deploy:
       resources:
@@ -22,9 +22,9 @@ services:
       DOCKER_ENABLE_SECURITY: "true"
       SECURITY_ENABLELOGIN: "true"
       SYSTEM_DEFAULTLOCALE: en-US
-      UI_APPNAME: Stirling-PDF-Lite
-      UI_HOMEDESCRIPTION: Demo site for Stirling-PDF-Lite Latest with Security
-      UI_APPNAMENAVBAR: Stirling-PDF-Lite Latest
+      UI_APPNAME: EasysPDF-Lite
+      UI_HOMEDESCRIPTION: Demo site for EasysPDF-Lite Latest with Security
+      UI_APPNAMENAVBAR: EasysPDF-Lite Latest
       SYSTEM_MAXFILESIZE: "100"
       METRICS_ENABLED: "true"
       SYSTEM_GOOGLEVISIBILITY: "true"

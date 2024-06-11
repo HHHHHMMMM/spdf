@@ -1,12 +1,26 @@
 version: '3.3'
 services:
-  stirling-pdf:
-    container_name: Stirling-PDF
-    image: frooodle/s-pdf:latest
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: easy_spdf_db
+      MYSQL_USER: orspdf
+      MYSQL_PASSWORD: easyspdfdbpassword314159
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+
+  easy-spdf:
+    container_name: easy-spdf
+    image: registry.cn-hangzhou.aliyuncs.com/sunhm3/sunhm3_rep:latest
     deploy:
       resources:
         limits:
-          memory: 4G
+          memory: 16G
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/api/v1/info/status | grep -q 'UP' && curl -fL http://localhost:8080/ | grep -qv 'Please sign in'"]
       interval: 5s
@@ -24,10 +38,18 @@ services:
       LANGS: "en_GB,en_US,ar_AR,de_DE,fr_FR,es_ES,zh_CN,zh_TW,ca_CA,it_IT,sv_SE,pl_PL,ro_RO,ko_KR,pt_BR,ru_RU,el_GR,hi_IN,hu_HU,tr_TR,id_ID"
       INSTALL_BOOK_AND_ADVANCED_HTML_OPS: "true"
       SYSTEM_DEFAULTLOCALE: en-US
-      UI_APPNAME: Stirling-PDF
-      UI_HOMEDESCRIPTION: Demo site for Stirling-PDF Latest
-      UI_APPNAMENAVBAR: Stirling-PDF Latest
+      UI_APPNAME: EasysPDF
+      UI_HOMEDESCRIPTION: Demo site for EasysPDF Latest
+      UI_APPNAMENAVBAR: EasysPDF Latest
       SYSTEM_MAXFILESIZE: "100"
       METRICS_ENABLED: "true"
       SYSTEM_GOOGLEVISIBILITY: "true"
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/easy_spdf_db?useSSL=false&serverTimezone=GMT%2B8&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useUnicode=true&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: orspdf
+      SPRING_DATASOURCE_PASSWORD: easyspdfdbpassword314159
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+          - db
     restart: on-failure:5
+volumes:
+   db_data:
