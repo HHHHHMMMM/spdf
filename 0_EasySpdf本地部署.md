@@ -379,39 +379,6 @@ CREATE TABLE `authorities` (
 
 ```
 
-#### 4.2 配置密文加密工具并生成数据库密码密文
-
-为了保证生产安全，数据库密码采用了jasypt来进行加密。因此在代码里配置数据库密码是其实是经过jasypt转换后的密文，故需要先行进行数据库密文的解密。
-
-以下是配置步骤：
-
-1. 下载jasypt(或在软件包中找到jasypt-1.9.3-dist.zip)
-
-   ```
-   wget https://github.com/jasypt/jasypt/releases/download/jasypt-1.9.3/jasypt-1.9.3-dist.zip
-   ```
-
-2. 解压jasypt
-
-   ```
-   unzip jasypt-1.9.3-dist.zip -d ~/jasypt
-   ```
-
-3. 使用jasypt工具进行加密**（请替换第三条命令的`your_plain_password`和`encryption_password`）**
-
-   ```
-   cd ~/jasypt/jasypt-1.9.3/bin &&\
-   chmod +x ./* &&\
-   ./encrypt.sh input=‘your_plain_password’ password=‘encryption_password’
-   ```
-
-   其中两个参数说明如下：
-
-   - `input`：你要加密的文本。
-   - `password`：用于加密的密码（密钥），也可以理解为一个加密因子 ，后期解密会根据这个加密因子来解密。
-
-   **执行完毕后请存好加密后的密文和加密因子。**
-
 ### 5. 步骤4：Clone and Build Easyspdf
 
 #### 5.1 安装构建工具
@@ -618,7 +585,7 @@ launch4j配置文件在项目根目录下，可自行执行配置。
 
   如果想修改logo，可以将要替换的logo放置到`customeFils/static`目录下，项目运行时会将新logo替换掉项目默认的favicon.svg。
 
-- `pipeline`:
+- ##### `pipeline`:
 
   流水线高级功能。
 
