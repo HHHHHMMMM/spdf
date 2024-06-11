@@ -1,4 +1,6 @@
-#  EasySpdf本地部署(必须有网络，依赖下载依赖于网络)
+#  EasySpdf本地部署
+
+**注意：本地部署必须要有网络来下载必要的依赖和组件**
 
 要在没有Docker/Podman的情况下运行应用程序，可能需要手动安装所有依赖项并构建必要的组件。
 
@@ -153,233 +155,25 @@ sudo apt update && sudo apt install libreoffice
 
 3. 安装完成后使用`soffice --version`可以查看版本，如果是24.2.3(最新版本)即可。
 
-### 4. 创建库表
+### 4. 步骤4：数据库搭建
 
-#### 4.1在mysql中建库表sql如下：
+本项目持久化层使用的JPA+hibernate，更换数据库非常方便。关于如何更换库，请参考：Easyspdf如何更换库。
 
-` users`表
+本项目默认使用`H2`作为数据库。H2数据库具有小巧方便，使用便捷的好处。
 
-```
-CREATE DATABASE  IF NOT EXISTS `easy_spdf_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `easy_spdf_db`;
--- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
---
--- Host: localhost    Database: easy_spdf_db
--- ------------------------------------------------------
--- Server version	8.0.37
+#### 4.1 使用H2数据库
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+由于本项目默认使用的是H2的数据库，故配置上无需调整，甚至无需建库建表，此步骤直接略过即可。
 
---
--- Table structure for table `users`
---
+#### 4.2 使用Mysql数据库
 
-DROP TABLE IF EXISTS `users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users` (
-  `USER_ID` bigint NOT NULL AUTO_INCREMENT,
-  `API_KEY` varchar(255) DEFAULT NULL,
-  `AUTHENTICATIONTYPE` varchar(255) DEFAULT NULL,
-  `ENABLED` tinyint(1) DEFAULT NULL,
-  `IS_FIRST_LOGIN` tinyint(1) DEFAULT NULL,
-  `PASSWORD` varchar(255) DEFAULT NULL,
-  `ROLE_NAME` varchar(255) DEFAULT NULL,
-  `USERNAME` varchar(255) DEFAULT NULL,
-  `chargedate` date DEFAULT NULL,
-  `expire_date` date DEFAULT NULL,
-  `is_expire` tinyint(1) DEFAULT NULL,
-  PRIMARY KEY (`USER_ID`),
-  UNIQUE KEY `USERNAME` (`USERNAME`)
-) ENGINE=InnoDB AUTO_INCREMENT=93 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+Mysql库作为Oracle旗下的关系型数据库，性能上比H2高出很多，支持比较复杂的业务处理。故如果后期需要针对项目做一些业务上复杂改造或者有可预见的大数据量可能性，推荐使用Mysql数据库。
+
+针对本项目，需要提供一个mysql数据库用户、密码、以及一个新建的库。这三者均可以自定义。其中，为了生产数据安全，数据库密码需要参考`2_配置密文加密工具并生成数据库密码密文.md`来进行密码加密。
 
 
 
-```
-
-`persistent_logins`表：
-
-```
-CREATE DATABASE  IF NOT EXISTS `easy_spdf_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `easy_spdf_db`;
--- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
---
--- Host: localhost    Database: easy_spdf_db
--- ------------------------------------------------------
--- Server version	8.0.37
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `persistent_logins`
---
-
-DROP TABLE IF EXISTS `persistent_logins`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `persistent_logins` (
-  `SERIES` varchar(255) NOT NULL,
-  `LAST_USED` timestamp NOT NULL,
-  `TOKEN` varchar(64) NOT NULL,
-  `USERNAME` varchar(64) NOT NULL,
-  PRIMARY KEY (`SERIES`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `persistent_logins`
---
-
-LOCK TABLES `persistent_logins` WRITE;
-/*!40000 ALTER TABLE `persistent_logins` DISABLE KEYS */;
-/*!40000 ALTER TABLE `persistent_logins` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2024-06-05 14:44:49
-
-```
-
-`user_settings`表：
-
-```
-CREATE DATABASE  IF NOT EXISTS `easy_spdf_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `easy_spdf_db`;
--- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
---
--- Host: localhost    Database: easy_spdf_db
--- ------------------------------------------------------
--- Server version	8.0.37
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `user_settings`
---
-
-DROP TABLE IF EXISTS `user_settings`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `user_settings` (
-  `USER_ID` bigint NOT NULL,
-  `SETTING_VALUE` varchar(255) DEFAULT NULL,
-  `SETTING_KEY` varchar(255) NOT NULL,
-  PRIMARY KEY (`USER_ID`,`SETTING_KEY`),
-  CONSTRAINT `FK8V82NJ88RMAI0NYCK19F873DW` FOREIGN KEY (`USER_ID`) REFERENCES `users` (`USER_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user_settings`
---
-
-LOCK TABLES `user_settings` WRITE;
-/*!40000 ALTER TABLE `user_settings` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_settings` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2024-06-05 14:44:49
-
-```
-
-`authorities`表：
-
-```
-CREATE DATABASE  IF NOT EXISTS `easy_spdf_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `easy_spdf_db`;
--- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
---
--- Host: localhost    Database: easy_spdf_db
--- ------------------------------------------------------
--- Server version	8.0.37
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `authorities`
---
-
-DROP TABLE IF EXISTS `authorities`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `authorities` (
-  `ID` bigint NOT NULL AUTO_INCREMENT,
-  `AUTHORITY` varchar(255) DEFAULT NULL,
-  `USER_ID` bigint DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `FKK91UPMBUEYIM93V469WJ7B2QH` (`USER_ID`),
-  CONSTRAINT `FKK91UPMBUEYIM93V469WJ7B2QH` FOREIGN KEY (`USER_ID`) REFERENCES `users` (`USER_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2024-06-05 14:44:49
-
-```
-
-### 5. 步骤4：Clone and Build Easyspdf
+### 5. 步骤5：Clone and Build Easyspdf
 
 #### 5.1 安装构建工具
 
