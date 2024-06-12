@@ -176,11 +176,27 @@ sudo apt update && sudo apt install libreoffice
 
 Mysql库作为Oracle旗下的关系型数据库，性能上比H2高出很多，支持比较复杂的业务处理。故如果后期需要针对项目做一些业务上复杂改造或者有可预见的大数据量可能性，推荐使用Mysql数据库。
 
-针对本项目，需要提供
+针对本项目，需要提供 
 
 1. mysql数据库用户
+
 2. mysql数据库密码
-3. 以及一个新建的库
+
+   ```
+   # 使用root登录进mysql数据库
+   mysql -u root -p
+   
+   #创建用户
+   CREATE USER 'newuser'@'%' IDENTIFIED BY 'password';
+   
+   #赋权
+   GRANT ALL PRIVILEGES ON *.* TO 'newuser'@'%' WITH GRANT OPTION;
+   
+   #刷新权限
+   FLUSH PRIVILEGES;
+   ```
+
+3. 以及一个新建的库(create datebase)
 
 这三者均可以自定义。其中，为了生产数据安全，数据库密码需要参考`2_配置密文加密工具并生成数据库密码密文.md`来进行密码加密。
 

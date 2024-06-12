@@ -192,11 +192,11 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/admin/saveUserbyAuto")
+    @GetMapping("/admin/saveUserbyAuto/{monthNum}")
     @ResponseBody
-    public List<String> saveUserByAuto() {
+    public List<String> saveUserByAuto(@PathVariable("monthNum") String monthNum) {
         // Add in batches username and password
-        return userService.saveUser();
+        return userService.saveUser(monthNum);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

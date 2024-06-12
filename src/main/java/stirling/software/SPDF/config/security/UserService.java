@@ -180,7 +180,7 @@ public class UserService implements UserServiceInterface {
         userRepository.save(user);
     }
 
-    public List<String> saveUser() throws IllegalArgumentException {
+    public List<String> saveUser(String monthNum) throws IllegalArgumentException {
         int numberOfUsernames = 10;
         int minLength = 5;
         int maxLength = 10;
@@ -200,7 +200,7 @@ public class UserService implements UserServiceInterface {
             user.setAuthenticationType(AuthenticationType.WEB);
             user.setFirstLogin(true);
             user.setChargeDate(currentDate);
-            user.setExpireDate(currentDate.plusMonths(3).plusDays(1));
+            user.setExpireDate(currentDate.plusMonths(Integer.parseInt(monthNum)).plusDays(1));
             user.setExpire(false);
             userRepository.save(user);
             usernames.add(username);
