@@ -14,6 +14,14 @@ docker部署easyspdf有几种方式，现罗列在下方。本项目主要在用
 
 如果对项目登录操作没有要求，或要求较低、或压根不需要登录操作，那么选择此种方式是最好不过了的，什么都不需要自己改，开箱即用，拉起来就能用。
 
+1. 先拉镜像
+
+```
+docker pull registry.cn-hangzhou.aliyuncs.com/sunhm3/easyspdf-full-with-H2:latest
+```
+
+2. docker run拉起来
+
 ```
 docker run -d \
   -p 8080:8080 \
@@ -23,9 +31,8 @@ docker run -d \
   -e DOCKER_ENABLE_SECURITY=false \
   -e INSTALL_BOOK_AND_ADVANCED_HTML_OPS=false \
   -e LANGS=en_GB \
-  --name stirling-pdf \
-  frooodle/s-pdf:latest
-
+  --name easyspdf-full-with-h2 \
+  registry.cn-hangzhou.aliyuncs.com/sunhm3/easyspdf-full-with-H2:latest
 
   Can also add these for customisation but are not required
 
@@ -38,9 +45,7 @@ docker run -d \
 
 ​	Mysql库适用于**有登录验证需求**且**预计数据量会比较大**的情况。后期可实现一些复杂查询操作，业务可拓展性比较强。
 
-#### 1. 使用外置mysql数据库
-
-​	则在/location/of/extraConfigs/目录下的custom_setting.yml中添加如下内容：
+1. 则在/location/of/extraConfigs/目录下的custom_setting.yml中添加如下内容：
 
 ```
 jasypt:
@@ -70,4 +75,28 @@ spring:
 3. ``spring.datasource.url`：将ip或域名补充完整，后面东西都可以不用动
 4. `spring.datasource.username`：数据库用户名
 
-​	
+2. 在目标库中建立easy_spdf_db库。
+
+3. 拉取镜像
+
+   ```
+   docker pull registry.cn-hangzhou.aliyuncs.com/sunhm3/easyspdf-full-with-mysql:latest
+   ```
+
+4. docker run拉起来
+
+   ```
+   docker run -d \
+     -p 8080:8080 \
+     -v /location/of/trainingData:/usr/share/tessdata \
+     -v /location/of/extraConfigs:/configs \
+     -v /location/of/logs:/logs \
+     -e DOCKER_ENABLE_SECURITY=false \
+     -e INSTALL_BOOK_AND_ADVANCED_HTML_OPS=false \
+     -e LANGS=en_GB \
+     --name easyspdf-full-with-mysql \
+     registry.cn-hangzhou.aliyuncs.com/sunhm3/easyspdf-full-with-mysql:latest
+   ```
+
+   
+

@@ -42,13 +42,15 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
         String ip = request.getRemoteAddr();
         logger.error("Failed login attempt from IP: {}", ip);
 
+        String contextPath = request.getContextPath();
+
         if (exception.getClass().isAssignableFrom(InternalAuthenticationServiceException.class)
                 || "Password must not be null".equalsIgnoreCase(exception.getMessage())) {
             if ("The Membership benefits has expired.".equals(exception.getMessage())) {
                 response.sendRedirect("/login?error=membershipHasExpiredError");
                 return;
             }
-            response.sendRedirect("/login?error=oauth2AuthenticationError");
+            response.sendRedirect(contextPath + "/login?error=oauth2AuthenticationError");
             return;
         }
 
@@ -63,13 +65,13 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
             loginAttemptService.loginFailed(username);
             if (loginAttemptService.isBlocked(username)
                     || exception.getClass().isAssignableFrom(LockedException.class)) {
-                response.sendRedirect("/login?error=locked");
+                response.sendRedirect(contextPath + "/login?error=locked");
                 return;
             }
         }
         if (exception.getClass().isAssignableFrom(BadCredentialsException.class)
                 || exception.getClass().isAssignableFrom(UsernameNotFoundException.class)) {
-            response.sendRedirect("/login?error=badcredentials");
+            response.sendRedirect(contextPath + "/login?error=badcredentials");
             return;
         }
 

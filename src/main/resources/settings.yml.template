@@ -30,7 +30,12 @@ security:
 #        clientSecret: "" # Client Secret for GitHub OAuth2
 #        scopes: "read:user" # Scope for GitHub OAuth2
 #        useAsUsername: "login" # Field to use as the username for GitHub OAuth2
-
+#      keycloak:
+#        issuer: "http://192.168.0.123:8888/realms/stirling-pdf" # URL of the Keycloak realm's OpenID Connect Discovery endpoint
+#        clientId: "stirling-pdf" # Client ID for Keycloak OAuth2
+#        clientSecret: "" # Client Secret for Keycloak OAuth2
+#        scopes: "openid, profile, email" # Scopes for Keycloak OAuth2
+#        useAsUsername: "email" # Field to use as the username for Keycloak OAuth2
 
 system:
   defaultLocale: 'en-US' # Set the default language (e.g. 'de-DE', 'fr-FR', etc)

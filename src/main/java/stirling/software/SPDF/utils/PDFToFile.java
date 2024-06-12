@@ -107,16 +107,18 @@ public class PDFToFile {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
+        // Get the original PDF file name without the extension
         String originalPdfFileName = Filenames.toSimpleFileName(inputFile.getOriginalFilename());
 
         if (originalPdfFileName == null || "".equals(originalPdfFileName.trim())) {
             originalPdfFileName = "output.pdf";
         }
+        // Assume file is pdf if no extension
         String pdfBaseName = originalPdfFileName;
         if (originalPdfFileName.contains(".")) {
             pdfBaseName = originalPdfFileName.substring(0, originalPdfFileName.lastIndexOf('.'));
         }
-
+        // Validate output format
         List<String> allowedFormats =
                 Arrays.asList("doc", "docx", "odt", "ppt", "pptx", "odp", "rtf", "xml", "txt:Text");
         if (!allowedFormats.contains(outputFormat)) {
@@ -129,11 +131,14 @@ public class PDFToFile {
         String fileName = "temp.file";
 
         try {
+            // Save the uploaded file to a temporary location
             tempInputFile = Files.createTempFile("input_", ".pdf");
             inputFile.transferTo(tempInputFile);
 
+            // Prepare the output directory
             tempOutputDir = Files.createTempDirectory("output_");
 
+            // Run the LibreOffice command
             List<String> command =
                     new ArrayList<>(
                             Arrays.asList(
@@ -175,6 +180,7 @@ public class PDFToFile {
             List<File> outputFiles = Arrays.asList(tempOutputDir.toFile().listFiles());
 
             if (outputFiles.size() == 1) {
+                // Return single output file
                 File outputFile = outputFiles.get(0);
                 if ("txt:Text".equals(outputFormat)) {
                     outputFormat = "txt";
@@ -182,6 +188,7 @@ public class PDFToFile {
                 fileName = pdfBaseName + "." + outputFormat;
                 fileBytes = FileUtils.readFileToByteArray(outputFile);
             } else {
+                // Return output files in a ZIP archive
                 fileName = pdfBaseName + "To" + outputFormat + ".zip";
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 try (ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {

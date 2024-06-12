@@ -1,4 +1,4 @@
-#  EasySpdf本地部署
+#  EasySpdf本地裸机部署
 
 **注意：本地部署必须要有网络来下载必要的依赖和组件**
 
@@ -14,8 +14,13 @@
 
 ## 1. 系统参数
 
-1. 4核(vCPU)32 GiB服务器，系统Ubuntu 22.04 64位 UEFI版，一个基本ESSD云盘(正常nas也可)，**要有基本网络可以下载依赖。**
-2. mysql8.0(首页登录使用)
+1. 8核(vCPU)16 GiB服务器，系统Ubuntu 22.04 64位 UEFI版，一个基本ESSD云盘(正常nas也可)，**要有基本网络可以下载依赖。** 
+
+   **注意**：PDF有些分解、合并、分析操作比较耗费CPU，有些读取操作比较耗费内存。建议服务器参数给的好一点，可以完成更复杂的操作。
+
+2. mysql8.0或H2(数据库首页登录使用)
+
+   **注意** : 本项目目前数据库的使用只在登录操作使用。
 
 ## 2. 步骤
 
@@ -94,10 +99,12 @@ Install the following software:
 Debian-based系统执行如下语句：
 
 ```
-#这里安装了所有libreoffice依赖，如果对磁盘空间有要求，可只安装 #libreoffice-writer libreoffice-calc libreoffice-impress 三个
+#这里安装了所有libreoffice依赖
 sudo apt-get install -y libreoffice unpaper ocrmypdf 
-#只安装部分libreoffice
+
+#如果对磁盘空间有要求，可只安装 libreoffice-writer libreoffice-calc libreoffice-impress 三个只安装部分libreoffice
 #sudo apt-get install -y libreoffice-writer libreoffice-calc libreoffice-impress unpaper ocrmypdf
+
 pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint --break-system-packages
 ```
 
@@ -157,9 +164,9 @@ sudo apt update && sudo apt install libreoffice
 
 ### 4. 步骤4：数据库搭建
 
-本项目持久化层使用的JPA+hibernate，更换数据库非常方便。关于如何更换库，请参考：Easyspdf如何更换库。
+本项目持久化层使用的JPA+hibernate，更换数据库非常方便。关于如何更换库，请参考：`3_Easyspdf如何更换库`。
 
-本项目默认使用`H2`作为数据库。H2数据库具有小巧方便，使用便捷的好处。
+本项目默认使用`H2`作为数据库。H2数据库具有小巧方便，使用便捷的好处，坏处是高并发、大数据量下的性能一般。
 
 #### 4.1 使用H2数据库
 
@@ -169,7 +176,13 @@ sudo apt update && sudo apt install libreoffice
 
 Mysql库作为Oracle旗下的关系型数据库，性能上比H2高出很多，支持比较复杂的业务处理。故如果后期需要针对项目做一些业务上复杂改造或者有可预见的大数据量可能性，推荐使用Mysql数据库。
 
-针对本项目，需要提供一个mysql数据库用户、密码、以及一个新建的库。这三者均可以自定义。其中，为了生产数据安全，数据库密码需要参考`2_配置密文加密工具并生成数据库密码密文.md`来进行密码加密。
+针对本项目，需要提供
+
+1. mysql数据库用户
+2. mysql数据库密码
+3. 以及一个新建的库
+
+这三者均可以自定义。其中，为了生产数据安全，数据库密码需要参考`2_配置密文加密工具并生成数据库密码密文.md`来进行密码加密。
 
 
 

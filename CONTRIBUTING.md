@@ -1,6 +1,6 @@
-# Contributing to EasysPDF
+# Contributing to Stirling-PDF
 
-Thank you for your interest in contributing to EasysPDF! There are many ways to contribute other than writing code. For example, reporting bugs, creating suggestions, and adding or modifying translations.
+Thank you for your interest in contributing to Stirling-PDF! There are many ways to contribute other than writing code. For example, reporting bugs, creating suggestions, and adding or modifying translations.
 
 ## Issue Guidelines
 
@@ -25,11 +25,11 @@ Please make sure your Pull Request adheres to the following guidelines:
 
 ## Translations
 
-If you would like to add or modify a translation, please see [How to add new languages to EasysPDF](HowToAddNewLanguage.md). Also, please create a Pull Request so others can use it!
+If you would like to add or modify a translation, please see [How to add new languages to Stirling-PDF](HowToAddNewLanguage.md). Also, please create a Pull Request so others can use it!
 
 ## Docs
 
-Documentation for EasysPDF is handled in a separate repository. Please see [Docs repository](https://github.com/Stirling-Tools/Stirling-Tools.github.io) or use "edit this page"-button at the bottom of each page at [https://stirlingtools.com/docs/](https://stirlingtools.com/docs/).
+Documentation for Stirling-PDF is handled in a separate repository. Please see [Docs repository](https://github.com/Stirling-Tools/Stirling-Tools.github.io) or use "edit this page"-button at the bottom of each page at [https://stirlingtools.com/docs/](https://stirlingtools.com/docs/).
 
 ## Fixing Bugs or Adding a New Feature
 
@@ -41,4 +41,4 @@ If, at any point of time, you have a question, please feel free to ask in the sa
 
 ## License
 
-By contributing to this project, you agree that your contributions will be licensed under the [GPL 3 License](LICENSE). You also acknowledge and agree that your contributions will be included in EasysPDF and that they can be relicensed in the future under the MPL 2.0 (Mozilla Public License Version 2.0) license.
+By contributing to this project, you agree that your contributions will be licensed under the [GPL 3 License](LICENSE). You also acknowledge and agree that your contributions will be included in Stirling-PDF and that they can be relicensed in the future under the MPL 2.0 (Mozilla Public License Version 2.0) license.
