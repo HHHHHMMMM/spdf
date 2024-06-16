@@ -16,11 +16,11 @@
 
 1. 8核(vCPU)16 GiB服务器，系统Ubuntu 22.04 64位 UEFI版，一个基本ESSD云盘(正常nas也可)，**要有基本网络可以下载依赖。** 
 
-   **注意**：PDF有些分解、合并、分析操作比较耗费CPU，有些读取操作比较耗费内存。建议服务器参数给的好一点，可以完成更复杂的操作。
+   **注意**：在极端情况下，大体量PDF分解、合并、分析操作比较耗费CPU，有些读取操作比较耗费内存。建议服务器参数给的好一点，可以完成更复杂的操作。
 
-2. mysql8.0或H2(数据库首页登录使用)
+2. H2或mysql8.0(数据库首页登录使用)
 
-   **注意** : 本项目目前数据库的使用只在登录操作使用。
+   **注意** : 本项目目前数据库的使用只在登录操作使用，本项目默认使用H2数据库。
 
 ## 2. 步骤
 
@@ -66,7 +66,10 @@ sudo make install
 **注意：**
 
 1. 如果`git clone`使用http无法下载，可以使用ssh方式，ssh的url为：`git@github.com:agl/jbig2enc.git`
+
 2. 如果报错没有权限读取远程仓库（fatal: Could not read from remote repository），请先ssh-keygen生成key之后，配置到github上。
+
+   
 
 ### 3. 步骤3：安装其他需要添加的软件
 
@@ -105,6 +108,7 @@ sudo apt-get install -y libreoffice unpaper ocrmypdf
 #如果对磁盘空间有要求，可只安装 libreoffice-writer libreoffice-calc libreoffice-impress 三个只安装部分libreoffice
 #sudo apt-get install -y libreoffice-writer libreoffice-calc libreoffice-impress unpaper ocrmypdf
 
+#安装python库
 pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint --break-system-packages
 ```
 
@@ -126,7 +130,8 @@ pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint --break-syst
    pip3 install uno opencv-python-headless unoconv pngquant WeasyPrint --break-system-packages
    ```
 
-   **注意(可选)：**libreoffice有较多版本，可尽量选择升级最新的版本。最新版本在转换性能上有一定提升。截止目前最新版本的libreoffice版本是24.2.3.2。
+
+**注意(可选)：**libreoffice有较多版本，可尽量选择升级最新的版本。最新版本在转换性能上有一定提升。截止目前最新版本的libreoffice版本是24.2.3.2。
 
 升级方法：
 
@@ -170,7 +175,7 @@ sudo apt update && sudo apt install libreoffice
 
 #### 4.1 使用H2数据库
 
-由于本项目默认使用的是H2的数据库，故配置上无需调整，甚至无需建库建表，此步骤直接略过即可。
+由于本项目默认使用的是H2的数据库，故配置上无需调整，甚至无需建库建表，此步骤4直接略过即可。
 
 #### 4.2 使用Mysql数据库
 
@@ -311,13 +316,7 @@ echo "Scripts installed."
 
 如果计划使用OCR功能，则在运行非英语扫描时可能需要为Tesseract安装语言包。
 
-1. 下载所需的语言包。您需要的语言的Traineddata文件。
-
-2. 请查看[OCRmyPDF安装指南](https://ocrmypdf.readthedocs.io/en/latest/installation.html)了解更多信息。
-
-   
-
-**重要:**不删除现有的'工程。训练数据，这是必需的。
+**重要:**不删除现有的工程训练数据，这是必需的。
 
 基于Debian的系统，用这个命令安装语言:
 
@@ -328,7 +327,14 @@ sudo apt install -y 'tesseract-ocr-*'
 dpkg-query -W tesseract-ocr-* | sed 's/tesseract-ocr-//g'
 ```
 
-下载好的包应该是在/usr/share/tesseract-ocr/4.00/tessdata下，确保`eng.traineddata`文件在，这个是必须的。
+**下载好的包应该是在/usr/share/tesseract-ocr/4.00/tessdata下，确保`eng.traineddata`文件在，这个是OCR必须的。**
+
+将`/usr/share/tesseract-ocr/4.00/tessdata`目录下所有内容拷贝到`/usr/share/tessdata`目录下。
+
+```
+mkdir -p /usr/share/tessdata
+cp /usr/share/tesseract-ocr/4.00/tessdata/* /usr/share/tessdata
+```
 
 ### 步骤7： 拉起应用
 
